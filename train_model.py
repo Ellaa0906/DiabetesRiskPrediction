@@ -8,7 +8,7 @@ from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import Pipeline
 from sklearn.impute import SimpleImputer
-from sklearn.tree import DecisionTreeClassifier
+from xgboost import XGBClassifier
 from sklearn.metrics import (
     accuracy_score,
     precision_score,
@@ -73,12 +73,13 @@ model = Pipeline([
     ("preprocessor", preprocessor),
     (
         "classifier",
-        DecisionTreeClassifier(
-            max_depth=5,
-            min_samples_leaf=5,
-            class_weight="balanced",
-            random_state=42
-        )
+    XGBClassifier(
+    n_estimators=100,
+    max_depth=3,
+    learning_rate=0.1,
+    random_state=42,
+    eval_metric="logloss"
+)
     )
 ])
 
@@ -104,7 +105,7 @@ print(confusion_matrix(y_test, predictions))
 # 11. Save trained model
 os.makedirs("models", exist_ok=True)
 
-joblib.dump(model, "models/decision_tree.joblib")
+joblib.dump(model, "models/xgboost_model.joblib")
 joblib.dump(X.columns.tolist(), "models/feature_columns.joblib")
 
 print("\nModel saved successfully!")
